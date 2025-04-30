@@ -5,3 +5,4 @@ gTTS==2.3.2
 speechrecognition==3.10.0
 pydub==0.25.1
 gunicorn==21.2.0
+flask-cors
