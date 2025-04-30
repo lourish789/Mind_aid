@@ -84,6 +84,16 @@
       border-radius: 5px;
       margin-top: 10px;
     }
+
+    #recordBtn {
+      margin-top: 10px;
+      padding: 10px 15px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -106,6 +116,7 @@
         <p><strong>AI:</strong> Hello! How can I assist you today?</p>
       </div>
       <input type="text" class="message-input" placeholder="Type your message here..." id="userInput">
+      <button id="recordBtn">Record Voice</button>
     </div>
   </div>
 
@@ -120,38 +131,90 @@
     const userInput = document.getElementById('userInput');
     const chatMessages = document.getElementById('chatMessages');
     const audioPlayer = document.getElementById('audioPlayer');
+    const recordBtn = document.getElementById('recordBtn');
 
     userInput.addEventListener('keypress', async function (e) {
       if (e.key === 'Enter' && this.value.trim() !== '') {
         const message = this.value.trim();
         chatMessages.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
         this.value = '';
+        await sendTextToBackend(message);
+      }
+    });
 
-        try {
-          const response = await fetch('http://localhost:8000/chat', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ user_input: message })
-          });
+    async function sendTextToBackend(message) {
+      try {
+        const response = await fetch('http://localhost:8000/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ user_input: message })
+        });
 
-          const data = await response.json();
+        const data = await response.json();
 
-          chatMessages.innerHTML += `<p><strong>AI:</strong> ${data.response_text}</p>`;
+        chatMessages.innerHTML += `<p><strong>AI:</strong> ${data.response_text}</p>`;
 
-          // Play audio if provided
-          if (data.audio_url) {
-            audioPlayer.src = data.audio_url;
-            audioPlayer.style.display = 'block';
-            audioPlayer.play();
-          }
-        } catch (error) {
-          console.error('Error:', error);
-          chatMessages.innerHTML += `<p><strong>AI:</strong> Sorry, something went wrong.</p>`;
+        if (data.audio_url) {
+          audioPlayer.src = data.audio_url;
+          audioPlayer.style.display = 'block';
+          audioPlayer.play();
         }
 
         chatMessages.scrollTop = chatMessages.scrollHeight;
+      } catch (error) {
+        console.error('Text Error:', error);
+        chatMessages.innerHTML += `<p><strong>AI:</strong> Something went wrong.</p>`;
+      }
+    }
+
+    // Voice recording logic
+    let mediaRecorder;
+    let audioChunks = [];
+
+    recordBtn.addEventListener('click', async () => {
+      if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.start();
+        audioChunks = [];
+        recordBtn.textContent = 'Recording... Click to Stop';
+
+        mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+
+        mediaRecorder.onstop = async () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+          const formData = new FormData();
+          formData.append('audio', audioBlob, 'input.wav');
+
+          try {
+            const response = await fetch('http://localhost:8000/chat', {
+              method: 'POST',
+              body: formData
+            });
+
+            const data = await response.json();
+
+            chatMessages.innerHTML += `<p><strong>You (voice):</strong> [Voice message]</p>`;
+            chatMessages.innerHTML += `<p><strong>AI:</strong> ${data.response_text}</p>`;
+
+            if (data.audio_url) {
+              audioPlayer.src = data.audio_url;
+              audioPlayer.style.display = 'block';
+              audioPlayer.play();
+            }
+
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+          } catch (error) {
+            console.error('Voice Error:', error);
+            chatMessages.innerHTML += `<p><strong>AI:</strong> Voice processing failed.</p>`;
+          }
+
+          recordBtn.textContent = 'Record Voice';
+        };
+      } else {
+        mediaRecorder.stop();
       }
     });
   </script>
