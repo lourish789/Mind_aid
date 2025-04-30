@@ -11,7 +11,8 @@ from gtts import gTTS
 import speech_recognition as sr
 from pydub import AudioSegment
 import random
-
+from flask_cors import CORS
+CORS(app)
 # Load environment variables
 load_dotenv()
 #API_KEY = os.getenv('GEMINI_API_KEY')
