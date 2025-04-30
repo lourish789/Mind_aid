@@ -108,28 +108,75 @@
             <input type="text" class="message-input" placeholder="Type your message here..." id="userInput">
         </div>
     </div>
+    <!-- Add after the chatbot-window -->
+<audio id="audioPlayer" controls style="display:none;"></audio>
 
-    <script>
-        function toggleChatbot() {
-            const chatbotWindow = document.getElementById('chatbotWindow');
-            chatbotWindow.style.display = chatbotWindow.style.display === 'none' ? 'block' : 'none';
+<script>
+    function toggleChatbot() {
+        const chatbotWindow = document.getElementById('chatbotWindow');
+        chatbotWindow.style.display = chatbotWindow.style.display === 'none' ? 'block' : 'none';
+    }
+
+    const userInput = document.getElementById('userInput');
+    const chatMessages = document.getElementById('chatMessages');
+    const audioPlayer = document.getElementById('audioPlayer');
+
+    userInput.addEventListener('keypress', async function (e) {
+        if (e.key === 'Enter' && this.value.trim() !== '') {
+            const message = this.value.trim();
+            chatMessages.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+            this.value = '';
+
+            // Send text input to Flask backend
+            try {
+                const response = await fetch('http://localhost:8000/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ user_input: message })
+                });
+
+                const data = await response.json();
+
+                chatMessages.innerHTML += `<p><strong>AI:</strong> ${data.response_text}</p>`;
+
+                // Play the audio response
+                audioPlayer.src = data.audio_url;
+                audioPlayer.style.display = 'block';
+                audioPlayer.play();
+            } catch (error) {
+                console.error('Error:', error);
+                chatMessages.innerHTML += `<p><strong>AI:</strong> Sorry, something went wrong.</p>`;
+            }
+
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
+    });
+</script>
+    
+  //  script
+     //   function toggleChatbot() {
+      //      const chatbotWindow = document.getElementById('chatbotWindow');
+     //       chatbotWindow.style.display = chatbotWindow.style.display === 'none' ? 'block' : 'none';
+    //    }
 
         // Basic chat functionality (you can expand this)
-        const userInput = document.getElementById('userInput');
-        const chatMessages = document.getElementById('chatMessages');
+      //  const userInput = document.getElementById('userInput');
+     //   const chatMessages = document.getElementById('chatMessages');
 
-        userInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                const message = this.value;
-                chatMessages.innerHTML += `<p>You: ${message}</p>`;
-                this.value = '';
+    //    userInput.addEventListener('keypress', function(e) {
+    //        if (e.key === 'Enter') {
+   //             const message = this.value;
+      //          chatMessages.innerHTML += `<p>You: ${message}</p>`;
+     //           this.value = '';
                 // Add AI response logic here
-                setTimeout(() => {
-                    chatMessages.innerHTML += `<p>AI: Thank you for your message!</p>`;
-                }, 1000);
-            }
-        });
-    </script>
+    //            setTimeout(() => {
+     //               chatMessages.innerHTML += `<p>AI: Thank you for your message!</p>`;
+       //         }, 1000);
+     //       }
+      //  });
+//    script
 </body>
 </html>
