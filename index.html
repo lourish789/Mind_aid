@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mind-Aid | Your Mental Health Companion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        .gradient-bg {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+        
+        .mood-option:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .chatbot-message {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .nav-link::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 2px;
+            background: #8b5cf6;
+            transition: width .3s;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="popup-form" class="fixed top-0 left-0 z-50 w-full h-full bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white p-10 rounded-lg shadow-lg w-1/2 md:w-1/3 lg:w-1/4">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Subscribe to our newsletter</h2>
+            <p class="text-lg text-gray-600 mb-6">Stay up-to-date with the latest news and updates from us.</p>
+            <form id="subscribe-form">
+                <input type="email" id="email" class="w-full p-2 pl-10 text-sm text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500" placeholder="Enter your email address">
+                <button type="submit" class="w-full p-2 mt-4 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">Subscribe</button>
+            </form>
+            <div id="thank-you-message" class="hidden text-lg text-gray-600 mt-4">Thank you for subscribing!</div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm fixed w-full z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-brain text-indigo-500 text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-indigo-600">Mind-Aid</span>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="#home" class="nav-link border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Home</a>
+                        <a href="#resources" class="nav-link border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Resources</a>
+                        <a href="#mood-tracker" class="nav-link border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Mood Tracker</a>
+                        <button id="aiToggle" class="bg-[#7ED6A7] hover:bg-[#6bc497] text-white px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center">
+                            <a href="#chatbot" class="bg-[#7ED6A7] hover:bg-[#6bc497] text-white px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center">
+                            <span class="mr-2">Activate AI Pal</span>
+                                <i class="fas fa-robot"></i>
+                            </a>
+                        </button>
+                        
+
+                        <div class="absolute top-4 right-10 hidden sm:flex sm:items-center">
+                            <button class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300">
+                                Sign In
+                            </button>
+                            <button class="ml-4 bg-white border border-indigo-500 text-indigo-500 hover:bg-indigo-50 px-4 py-2 rounded-md text-sm font-medium transition duration-300">
+                                Sign Up
+                            </button>
+                        </div>
+                        <div class="-mr-2 flex items-center sm:hidden">
+                            <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" aria-controls="mobile-menu" aria-expanded="false" id="mobile-menu-button">
+                                <span class="sr-only">Open main menu</span>
+                                <i class="fas fa-bars text-xl"></i>
+                            </button>
+                        </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div class="hidden sm:hidden" id="mobile-menu">
+            <div class="pt-2 pb-3 space-y-1">
+                <a href="#home" class="bg-indigo-50 border-indigo-500 text-indigo-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Home</a>
+                <a href="#resources" class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Resources</a>
+                <a href="#mood-tracker" class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Mood Tracker</a>
+                <a href="#chatbot" class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Ai pal</a>
+                <div class="pt-4 pb-3 border-t border-blue-200">
+                    <div class="flex items-center px-4">
+                        <button class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium w-full transition duration-300">
+                            Sign In
+                        </button>
+                    </div>
+                    <div class="mt-3 space-y-1 px-4">
+                        <button class="bg-white border border-indigo-500 text-indigo-500 hover:bg-indigo-50 px-4 py-2 rounded-md text-sm font-medium w-full transition duration-300">
+                            Sign Up
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="gradient-bg text-gray-bold pt-24 pb-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:grid lg:grid-cols-2 lg:gap-8 items-center">
+                <div class="mb-12 lg:mb-0">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-6"><b style="color: grey;">Revolutionizing Mental Health with</b> <b style="color: #4A90E2;">AI-Powered</b> <b style="color: gray;">Care</b></h1>
+                    <p class="text-lg md:text-xl mb-8 opacity-90">Mind-Aid combines wearable EEG technology with advanced AI to detect early signs of mental health conditions and provide real-time therapeutic support. Our mission is to make mental healthcare proactive, not reactive.</p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button class="bg-white text-indigo-600 hover:bg-gray-100 px-6 py-3 rounded-lg font-medium text-lg transition duration-300 shadow-lg" class="getstat">
+                            Get Started
+                        </button>
+                        <button class="bg-transparent border-2 border-white hover:bg-white hover:bg-opacity-10 px-6 py-3 rounded-lg font-medium text-lg transition duration-300 shadow-lg">
+                            Learn More
+                        </button> 
+                    </div>
+                </div>
+                <div class="relative">
+                    <img src="https://illustrations.popsy.co/amber/digital-nomad.svg" alt="Mind-Aid Headband" class="w-full max-w-md mx-auto" id="animated-image">
+                    <div class="absolute -bottom-6 -left-6 bg-white p-4 rounded-lg shadow-lg hidden md:block">
+                        <div class="flex items-center">
+                            <div class="bg-indigo-100 p-3 rounded-full mr-3">
+                                <i class="fas fa-heart text-indigo-500 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-gray-600 text-sm">Daily Check-ins</p>
+                                <p class="font-bold text-gray-800">1,000+ users</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">How Mind-Aid Helps You</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Our comprehensive platform offers multiple ways to support your mental wellbeing journey.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-gray-50 p-8 rounded-xl hover:shadow-lg transition duration-300">
+                    <div class="bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-book text-indigo-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Curated Resources</h3>
+                    <p class="text-gray-600">Access articles, videos, and therapist directories tailored to your needs and preferences.</p>
+                </div>
+                
+                <div class="bg-gray-50 p-8 rounded-xl hover:shadow-lg transition duration-300">
+                    <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-chart-line text-purple-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Mood Tracking</h3>
+                    <p class="text-gray-600">Log your emotions daily and visualize patterns to better understand your mental health journey.</p>
+                </div>
+                
+                <div class="bg-gray-50 p-8 rounded-xl hover:shadow-lg transition duration-300">
+                    <div class="bg-pink-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-robot text-pink-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">AI Companion</h3>
+                    <p class="text-gray-600">Our compassionate chatbot provides immediate support and guidance whenever you need it.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Section -->
+    <section id="resources" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Mental Health Resources</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Find carefully selected resources to support your mental wellbeing.</p>
+            </div>
+            
+            <div class="mb-8 flex flex-wrap justify-center gap-4">
+                <button class="px-4 py-2 bg-indigo-500 text-white rounded-full text-sm font-medium">All</button>
+                <button class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-50">Articles</button>
+                <button class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-50">Videos</button>
+                <button class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-50">Therapists</button>
+                <button class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-50">Podcasts</button>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Resource Card 1 -->
+                <div class="resource-card bg-white rounded-xl overflow-hidden shadow-md transition duration-300">
+                    <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=772&q=80" alt="Meditation" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex items-center mb-2">
+                            <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded">Article</span>
+                            <span class="text-gray-500 text-sm ml-auto"><i class="fas fa-clock mr-1"></i> 8 min read</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">10 Mindfulness Techniques for Daily Life</h3>
+                        <p class="text-gray-600 mb-4">Learn simple mindfulness exercises you can incorporate into your routine to reduce stress and increase focus.</p>
+                        <div class="flex items-center">
+                            <div class="flex items-center mr-4">
+                                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                                <span class="text-gray-700">4.8</span>
+                            </div>
+                            <button class="text-indigo-500 hover:text-indigo-700 font-medium ml-auto">Read More</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Resource Card 2 -->
+                <div class="resource-card bg-white rounded-xl overflow-hidden shadow-md transition duration-300">
+                    <div class="relative h-48 bg-gray-800 flex items-center justify-center">
+                        <i class="fas fa-play-circle text-white text-5xl opacity-75"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-2">
+                            <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded">Video</span>
+                            <span class="text-gray-500 text-sm ml-auto"><i class="fas fa-clock mr-1"></i> 15 min</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Managing Anxiety in Uncertain Times</h3>
+                        <p class="text-gray-600 mb-4">A clinical psychologist shares practical strategies for coping with anxiety when facing uncertainty.</p>
+                        <div class="flex items-center">
+                            <div class="flex items-center mr-4">
+                                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                                <span class="text-gray-700">4.9</span>
+                            </div>
+                            <button class="text-indigo-500 hover:text-indigo-700 font-medium ml-auto">Watch Now</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Resource Card 3 -->
+                <div class="resource-card bg-white rounded-xl overflow-hidden shadow-md transition duration-300">
+                    <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80" alt="Therapist" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex items-center mb-2">
+                            <span class="bg-pink-100 text-pink-800 text-xs font-medium px-2.5 py-0.5 rounded">Therapist</span>
+                            <span class="text-gray-500 text-sm ml-auto"><i class="fas fa-map-marker-alt mr-1"></i> Online</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Dr. Sarah Johnson, PhD</h3>
+                        <p class="text-gray-600 mb-4">Specializing in cognitive behavioral therapy for depression and anxiety disorders. Accepting new patients.</p>
+                        <div class="flex items-center">
+                            <div class="flex items-center mr-4">
+                                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                                <span class="text-gray-700">4.7</span>
+                            </div>
+                            <button class="text-indigo-500 hover:text-indigo-700 font-medium ml-auto">View Profile</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <button class="px-6 py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg font-medium shadow-lg transition duration-300">
+                    View All Resources
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mood Tracker Section -->
+    <section id="mood-tracker" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:grid lg:grid-cols-2 lg:gap-12 items-center">
+                <div class="mb-12 lg:mb-0">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-4">Track Your Mood</h2>
+                    <p class="text-lg text-gray-600 mb-6">Understanding your emotional patterns is the first step toward better mental health. Log your mood daily to identify trends and triggers.</p>
+                    
+                    <div class="bg-gray-50 p-6 rounded-xl mb-8">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">How are you feeling today?</h3>
+                        <div class="grid grid-cols-5 gap-4">
+                            <div class="mood-option flex flex-col items-center p-3 bg-red-50 rounded-lg cursor-pointer transition duration-300" data-mood="angry">
+                                <i class="fas fa-angry text-red-500 text-3xl mb-2"></i>
+                                <span class="text-sm text-gray-700">Angry</span>
+                            </div>
+                            <div class="mood-option flex flex-col items-center p-3 bg-blue-50 rounded-lg cursor-pointer transition duration-300" data-mood="sad">
+                                <i class="fas fa-sad-tear text-blue-500 text-3xl mb-2"></i>
+                                <span class="text-sm text-gray-700">Sad</span>
+                            </div>
+                            <div class="mood-option flex flex-col items-center p-3 bg-gray-100 rounded-lg cursor-pointer transition duration-300" data-mood="neutral">
+                                <i class="fas fa-meh text-gray-500 text-3xl mb-2"></i>
+                                <span class="text-sm text-gray-700">Neutral</span>
+                            </div>
+                            <div class="mood-option flex flex-col items-center p-3 bg-yellow-50 rounded-lg cursor-pointer transition duration-300" data-mood="happy">
+                                <i class="fas fa-smile text-yellow-500 text-3xl mb-2"></i>
+                                <span class="text-sm text-gray-700">Happy</span>
+                            </div>
+                            <div class="mood-option flex flex-col items-center p-3 bg-green-50 rounded-lg cursor-pointer transition duration-300" data-mood="excited">
+                                <i class="fas fa-grin-stars text-green-500 text-3xl mb-2"></i>
+                                <span class="text-sm text-gray-700">Excited</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <label for="mood-notes" class="block text-sm font-medium text-gray-700 mb-2">Notes (optional)</label>
+                            <textarea id="mood-notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="What's contributing to how you feel today?"></textarea>
+                        </div>
+                        
+                        <button id="log-mood-btn" class="mt-4 w-full bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-4 rounded-md font-medium transition duration-300">
+                            Log Mood
+                        </button>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-lg">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-medium text-gray-900">Your Mood History</h3>
+                            <div class="flex">
+                                <button class="px-3 py-1 bg-gray-100 text-gray-700 rounded-l-md text-sm">Week</button>
+                                <button class="px-3 py-1 border-l border-gray-300 bg-indigo-500 text-white text-sm">Month</button>
+                                <button class="px-3 py-1 border-l border-gray-300 bg-gray-100 text-gray-700 rounded-r-md text-sm">Year</button>
+                            </div>
+                        </div>
+                        
+                        <div class="h-64">
+                            <canvas id="mood-chart"></canvas>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <h4 class="text-sm font-medium text-gray-900 mb-2">Insights</h4>
+                            <p class="text-sm text-gray-600">Your mood has been generally positive this month, with a slight dip mid-week. You reported feeling most happy on weekends.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chatbot Section -->
+    <section id="chatbot" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Talk to Ai pal</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Our compassionate AI companion is here to listen and provide support whenever you need it.</p>
+            </div>
+            
+            <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-indigo-500 text-white p-4 flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-indigo-400 flex items-center justify-center mr-3">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-medium">Ai pal</h3>
+                        <p class="text-xs opacity-80">Online</p>
+                    </div>
+                    <div class="ml-auto flex space-x-2">
+                        <button class="w-8 h-8 rounded-full bg-indigo-400 hover:bg-indigo-600 flex items-center justify-center transition duration-300">
+                            <i class="fas fa-ellipsis-h text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="h-96 overflow-y-auto p-4 bg-gray-50" id="chat-container">
+                    <div class="chatbot-message mb-4">
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                                <i class="fas fa-robot text-indigo-500"></i>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg shadow-sm max-w-xs md:max-w-md">
+                                <p class="text-gray-800">Hi there! I'm Ai pal, your mental health companion. How are you feeling today?</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="user-message mb-4">
+                        <div class="flex items-start justify-end">
+                            <div class="bg-indigo-500 text-white p-3 rounded-lg shadow-sm max-w-xs md:max-w-md ml-3">
+                                <p>I've been feeling a bit anxious lately.</p>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center">
+                                <i class="fas fa-user text-white text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chatbot-message mb-4">
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                                <i class="fas fa-robot text-indigo-500"></i>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg shadow-sm max-w-xs md:max-w-md">
+                                <p class="text-gray-800">I'm sorry to hear you're feeling anxious. Would you like to talk about what's been on your mind?</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="user-message mb-4">
+                        <div class="flex items-start justify-end">
+                            <div class="bg-indigo-500 text-white p-3 rounded-lg shadow-sm max-w-xs md:max-w-md ml-3">
+                                <p>Work has been really stressful.</p>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center">
+                                <i class="fas fa-user text-white text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chatbot-message mb-4">
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                                <i class="fas fa-robot text-indigo-500"></i>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg shadow-sm max-w-xs md:max-w-md">
+                                <p class="text-gray-800">Work stress can be challenging. Have you tried any relaxation techniques like deep breathing or taking short breaks?</p>
+                                <div class="mt-2">
+                                    <button class="quick-reply-btn px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs mr-2 mb-2">Yes, but still stressed</button>
+                                    <button class="quick-reply-btn px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs mr-2 mb-2">No, tell me more</button>
+                                    <button class="quick-reply-btn px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs">I need different help</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border-t border-gray-200 p-4 bg-white">
+                    <div class="flex items-center">
+                        <button class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center mr-2 transition duration-300">
+                            <i class="fas fa-plus text-gray-600"></i>
+                        </button>
+                        <input type="text" placeholder="Type your message..." class="flex-1 border border-gray-300 rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <button class="ml-2 w-10 h-10 rounded-full bg-indigo-500 hover:bg-indigo-600 flex items-center justify-center text-white transition duration-300">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+                <button class="text-[#7ED6A7] text-sm text-center font-medium hover:underline mx-auto block">
+                    <i class="fas fa-headphones mr-1"></i><b>Start Audio Session</b>
+                    </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-16 bg-indigo-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">What Our Users Say</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Hear from people who have found support through Mind-Aid.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-xl shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mr-4">
+                            <i class="fas fa-user text-indigo-500 text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-900">Alex K.</h4>
+                            <div class="flex">
+                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">"The mood tracker helped me identify patterns in my emotions I never noticed before. My therapist was impressed with the insights!"</p>
+                </div>
+                
+                <div class="bg-white p-8 rounded-xl shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mr-4">
+                            <i class="fas fa-user text-indigo-500 text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-900">Jamie L.</h4>
+                            <div class="flex">
+                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">"Ai pal the chatbot has been a lifesaver during late-night anxiety attacks. It's like having a therapist available 24/7."</p>
+                </div>
+                
+                <div class="bg-white p-8 rounded-xl shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mr-4">
+                            <i class="fas fa-user text-indigo-500 text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-900">Taylor M.</h4>
+                            <div class="flex">
+                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                <i class="fas fa-star-half-alt text-yellow-400 text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">"The resource library helped me find a therapist who specializes in exactly what I needed. I'm making progress for the first time in years."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 gradient-bg text-gray-bold">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl font-bold mb-6">Ready to take control of your mental health?</h2>
+            <p class="text-xl mb-8 max-w-3xl mx-auto opacity-90">Join thousands of others who have found support through Mind-Aid.</p>
+            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <button class="bg-white text-indigo-600 hover:bg-gray-100 px-8 py-4 rounded-lg font-medium text-lg transition duration-300 shadow-lg">
+                    Sign Up for Free
+                </button>
+                <button class="bg-transparent border-2 border-white hover:bg-white hover:bg-opacity-10 px-8 py-4 rounded-lg font-medium text-lg transition duration-300 shadow-lg">
+                    Learn More
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-12 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="text-lg font-medium mb-4">Mind-Aid</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Press</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-medium mb-4">Resources</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Articles</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Videos</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Therapists</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Podcasts</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-medium mb-4">Support</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Help Center</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Terms of Service</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-medium mb-4">Connect</h3>
+                    <div class="flex space-x-4 mb-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 hover:bg-indigo-500 flex items-center justify-center transition duration-300">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 hover:bg-indigo-500 flex items-center justify-center transition duration-300">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 hover:bg-indigo-500 flex items-center justify-center transition duration-300">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 hover:bg-indigo-500 flex items-center justify-center transition duration-300">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                    <p class="text-gray-400 text-sm">Subscribe to our newsletter</p>
+                    <div class="mt-2 flex">
+                        <input type="email" placeholder="Your email" class="px-3 py-2 bg-gray-800 text-white rounded-l-md focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full">
+                        <button class="bg-indigo-500 hover:bg-indigo-600 px-4 py-2 rounded-r-md transition duration-300">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm mb-4 md:mb-0">© 2025 Mind-Aid. All rights reserved.</p>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300 text-sm">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300 text-sm">Terms of Service</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300 text-sm">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Mood selection
+        const moodOptions = document.querySelectorAll('.mood-option');
+        moodOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                moodOptions.forEach(opt => opt.classList.remove('ring-2', 'ring-indigo-500'));
+                this.classList.add('ring-2', 'ring-indigo-500');
+            });
+        });
+
+        // Log mood button
+        document.getElementById('log-mood-btn').addEventListener('click', function() {
+            const selectedMood = document.querySelector('.mood-option.ring-2');
+            if (selectedMood) {
+                const mood = selectedMood.getAttribute('data-mood');
+                const notes = document.getElementById('mood-notes').value;
+                
+                // In a real app, this would send data to your backend
+                alert(`Mood logged: ${mood}\nNotes: ${notes || 'None'}`);
+                
+                // Reset selection
+                moodOptions.forEach(opt => opt.classList.remove('ring-2', 'ring-indigo-500'));
+                document.getElementById('mood-notes').value = '';
+            } else {
+                alert('Please select how you feel today');
+            }
+        });
+
+        // Mood chart
+        const ctx = document.getElementById('mood-chart').getContext('2d');
+        const moodChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                datasets: [
+                    {
+                        label: 'Happiness',
+                        data: [3, 4, 5, 4],
+                        borderColor: '#10B981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: 'Stress',
+                        data: [4, 3, 2, 3],
+                        borderColor: '#EF4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 5,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+
+        // Chatbot quick replies
+        const quickReplyButtons = document.querySelectorAll('.quick-reply-btn');
+        quickReplyButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const replyText = this.textContent;
+                
+                // Add user reply to chat
+                const chatContainer = document.getElementById('chat-container');
+                const userMessage = document.createElement('div');
+                userMessage.className = 'user-message mb-4';
+                userMessage.innerHTML = `
+                    <div class="flex items-start justify-end">
+                        <div class="bg-indigo-500 text-white p-3 rounded-lg shadow-sm max-w-xs md:max-w-md ml-3">
+                            <p>${replyText}</p>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                    </div>
+                `;
+                chatContainer.appendChild(userMessage);
+                
+                // Scroll to bottom
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+                // Simulate bot response after a delay
+                setTimeout(() => {
+                    const botResponses = [
+                        "I understand. Let's explore some coping strategies that might help with work stress.",
+                        "That's completely normal. Many people find mindfulness exercises helpful in similar situations.",
+                        "I'm here to help. Would you like me to suggest some resources specifically for work-related stress?"
+                    ];
+                    
+                    const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
+                    
+                    const botMessage = document.createElement('div');
+                    botMessage.className = 'chatbot-message mb-4';
+                    botMessage.innerHTML = `
+                        <div class="flex items-start">
+                            <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                                <i class="fas fa-robot text-indigo-500"></i>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg shadow-sm max-w-xs md:max-w-md">
+                                <p class="text-gray-800">${randomResponse}</p>
+                            </div>
+                        </div>
+                    `;
+                    chatContainer.appendChild(botMessage);
+                    
+                    // Scroll to bottom again
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                }, 1000);
+            });
+        });
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    const mobileMenu = document.getElementById('mobile-menu');
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            });
+        });
+
+        const popupForm = document.getElementById('popup-form');
+    const subscribeForm = document.getElementById('subscribe-form');
+    const emailInput = document.getElementById('email');
+    const thankYouMessage = document.getElementById('thank-you-message');
+
+    // Automatically pop up the form after 5 seconds
+    setTimeout(() => {
+        popupForm.classList.remove('hidden');
+    }, 5000);
+
+    subscribeForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = emailInput.value;
+        // Add your email subscription logic here
+        console.log(`Subscribed with email: ${email}`);
+        subscribeForm.classList.add('hidden');
+        thankYouMessage.classList.remove('hidden');
+        setTimeout(() => {
+            popupForm.classList.add('hidden');
+            subscribeForm.classList.remove('hidden');
+            thankYouMessage.classList.add('hidden');
+            emailInput.value = '';
+        }, 3000);
+    });
+
+    document.addEventListener('click', (e) => {
+        if (e.target === popupForm) {
+            popupForm.classList.add('hidden');
+        }
+    });
+    const animatedImage = document.getElementById('animated-image');
+
+let translateY = 0;
+let direction = 0.5;
+let lastUpdate = 0;
+
+function animateImage(timestamp) {
+    if (timestamp - lastUpdate < 16) { // only update every 16ms (60fps)
+        requestAnimationFrame(animateImage);
+        return;
+    }
+    lastUpdate = timestamp;
+
+    translateY += direction * 1;
+    animatedImage.style.transform = `translateY(${translateY}px)`;
+    if (translateY > 10 || translateY < -10) {
+        direction *= -1;
+    }
+    requestAnimationFrame(animateImage);
+}
+
+animateImage();
+const API_BASE = "https://mind-aid-api.onrender.com/api";
+
+const API = {
+  subscribe: `${API_BASE}/subscribe`,
+  signin: `${API_BASE}/signin`,
+  signup: `${API_BASE}/signup`,
+  chat: `${API_BASE}/chat`,
+  audio: `${API_BASE}/audio`
+  // Add more as needed
+};
+
+async function postData(url, data) {
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+      return await res.json();
+    } catch (err) {
+      console.error("API error:", err);
+    }
+  }
+
+  // Example usage:
+  function subscribeUser(email) {
+    return postData(API.subscribe, { email });
+  }
+    </script>
+</body>
+</html>

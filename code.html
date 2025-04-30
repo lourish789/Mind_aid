@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pitch Demo Interface</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --background-color: #ecf0f1;
+            --text-color: #2c3e50;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .hero-section {
+            padding: 40px 20px;
+            text-align: center;
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .chatbot-section {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .chatbot-toggle {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .chatbot-window {
+            display: none;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+        }
+
+        .chatbot-header {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 10px;
+            border-radius: 5px 5px 0 0;
+        }
+
+        .chat-messages {
+            height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .message-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Pitch Demo Interface</h1>
+    </div>
+
+    <div class="hero-section">
+        <h2>Our Product: AI-Powered Solutions</h2>
+        <p>Transform your business with our innovative AI solutions</p>
+    </div>
+
+    <div class="chatbot-section">
+        <button class="chatbot-toggle" onclick="toggleChatbot()">Chat with our AI Assistant</button>
+        <div class="chatbot-window" id="chatbotWindow">
+            <div class="chatbot-header">
+                <h3>AI Assistant</h3>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <p>AI: Hello! How can I assist you today?</p>
+            </div>
+            <input type="text" class="message-input" placeholder="Type your message here..." id="userInput">
+        </div>
+    </div>
+
+    <script>
+        function toggleChatbot() {
+            const chatbotWindow = document.getElementById('chatbotWindow');
+            chatbotWindow.style.display = chatbotWindow.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Basic chat functionality (you can expand this)
+        const userInput = document.getElementById('userInput');
+        const chatMessages = document.getElementById('chatMessages');
+
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const message = this.value;
+                chatMessages.innerHTML += `<p>You: ${message}</p>`;
+                this.value = '';
+                // Add AI response logic here
+                setTimeout(() => {
+                    chatMessages.innerHTML += `<p>AI: Thank you for your message!</p>`;
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>
