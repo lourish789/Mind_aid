@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/chat",
+      "destination": "https://mind-aid-api.onrender.com/chat"
+    }
+  ]
+}
