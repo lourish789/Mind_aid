@@ -1,8 +1,12 @@
 {
-  "rewrites": [
-    {
-      "source": "/chat",
-      "destination": "https://mind-aid-api.onrender.com/chat"
-    }
-  ]
+  "version": 2,
+  "builds": [
+    { "src": "*.html", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "/$1" }
+  ],
+  "env": {
+    "BACKEND_URL": "https://mind-aid-api.onrender.com"
+  }
 }
