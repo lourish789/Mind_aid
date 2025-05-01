@@ -128,13 +128,10 @@
       chatbotWindow.style.display = chatbotWindow.style.display === 'none' ? 'block' : 'none';
     }
 
-
     const audioPlayer = document.getElementById('audioPlayer');
     const recordBtn = document.getElementById('recordBtn');
     const userInput = document.getElementById('userInput');
     const chatMessages = document.getElementById('chatMessages');
-
-    // Define backend URL
     const BACKEND_URL = 'https://mind-aid-api.onrender.com';
 
     userInput.addEventListener('keypress', async function (e) {
@@ -157,11 +154,9 @@
         });
 
         const data = await response.json();
-
         chatMessages.innerHTML += `<p><strong>AI:</strong> ${data.response_text}</p>`;
 
         if (data.audio_url) {
-          // Make sure to use the full URL for audio as well
           audioPlayer.src = `${BACKEND_URL}${data.audio_url}`;
           audioPlayer.style.display = 'block';
           audioPlayer.play();
@@ -174,7 +169,6 @@
       }
     }
 
-    // Voice recording logic
     let mediaRecorder;
     let audioChunks = [];
 
@@ -206,7 +200,6 @@
               chatMessages.innerHTML += `<p><strong>AI:</strong> ${data.response_text}</p>`;
 
               if (data.audio_url) {
-                // Make sure to use the full URL for audio as well
                 audioPlayer.src = `${BACKEND_URL}${data.audio_url}`;
                 audioPlayer.style.display = 'block';
                 audioPlayer.play();
@@ -232,10 +225,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
-              
