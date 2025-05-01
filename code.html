@@ -147,7 +147,7 @@ userInput.addEventListener('keypress', async function (e) {
 async function sendTextToBackend(message) {
   try {
     // Use your actual Render backend URL here
-    const BACKEND_URL = 'https://your-mind-aid-backend.onrender.com';
+    const BACKEND_URL = 'https://mind-aid-api.onrender.com';
     
     const response = await fetch(`${BACKEND_URL}/chat`, {
       method: 'POST',
@@ -196,7 +196,7 @@ recordBtn.addEventListener('click', async () => {
 
       try {
         // Use your actual Render backend URL here
-        const BACKEND_URL = 'https://your-mind-aid-backend.onrender.com';
+        const BACKEND_URL = 'https://mind-aid-api.onrender.com';
         
         const response = await fetch(`${BACKEND_URL}/chat`, {
           method: 'POST',
