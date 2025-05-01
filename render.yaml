@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: mind-aid-api
+    name: mind-aid
     env: python
     plan: free
     buildCommand: pip install -r requirements.txt
