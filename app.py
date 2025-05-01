@@ -1,5 +1,4 @@
 # backend/app.py
-
 from flask import Flask, request, jsonify, send_file
 import os
 import google.generativeai as genai
@@ -13,7 +12,14 @@ from werkzeug.utils import secure_filename
 
 # Initialize Flask
 app = Flask(__name__)
-CORS(app)
+
+# More specific CORS configuration
+# Replace 'https://your-mind-aid-frontend.vercel.app' with your actual Vercel domain
+CORS(app, resources={r"/*": {
+    "origins": ["https://mind-aid.vercel.app", "http://localhost:3000"],
+    "methods": ["GET", "POST", "OPTIONS"],
+    "allow_headers": ["Content-Type", "Authorization"]
+}})
 
 # Load environment variables
 load_dotenv()
