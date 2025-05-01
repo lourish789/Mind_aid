@@ -16,7 +16,7 @@ app = Flask(__name__)
 # More specific CORS configuration
 # Replace 'https://your-mind-aid-frontend.vercel.app' with your actual Vercel domain
 CORS(app, resources={r"/*": {
-    "origins": ["https://mind-aid.vercel.app", "http://localhost:3000"],
+    "origins": ["https://mind-aid-jade.vercel.app", "http://localhost:3000"],
     "methods": ["GET", "POST", "OPTIONS"],
     "allow_headers": ["Content-Type", "Authorization"]
 }})
