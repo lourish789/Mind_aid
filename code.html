@@ -133,6 +133,101 @@
     const audioPlayer = document.getElementById('audioPlayer');
     const recordBtn = document.getElementById('recordBtn');
 
+    // Replace these fetch calls in your frontend code
+
+userInput.addEventListener('keypress', async function (e) {
+  if (e.key === 'Enter' && this.value.trim() !== '') {
+    const message = this.value.trim();
+    chatMessages.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+    this.value = '';
+    await sendTextToBackend(message);
+  }
+});
+
+async function sendTextToBackend(message) {
+  try {
+    // Use your actual Render backend URL here
+    const BACKEND_URL = 'https://your-mind-aid-backend.onrender.com';
+    
+    const response = await fetch(`${BACKEND_URL}/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ user_input: message })
+    });
+
+    const data = await response.json();
+
+    chatMessages.innerHTML += `<p><strong>AI:</strong> ${data.response_text}</p>`;
+
+    if (data.audio_url) {
+      // Make sure to use the full URL for audio as well
+      audioPlayer.src = `${BACKEND_URL}${data.audio_url}`;
+      audioPlayer.style.display = 'block';
+      audioPlayer.play();
+    }
+
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  } catch (error) {
+    console.error('Text Error:', error);
+    chatMessages.innerHTML += `<p><strong>AI:</strong> Something went wrong.</p>`;
+  }
+}
+
+// Voice recording logic
+let mediaRecorder;
+let audioChunks = [];
+
+recordBtn.addEventListener('click', async () => {
+  if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.start();
+    audioChunks = [];
+    recordBtn.textContent = 'Recording... Click to Stop';
+
+    mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+
+    mediaRecorder.onstop = async () => {
+      const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'input.wav');
+
+      try {
+        // Use your actual Render backend URL here
+        const BACKEND_URL = 'https://your-mind-aid-backend.onrender.com';
+        
+        const response = await fetch(`${BACKEND_URL}/chat`, {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        chatMessages.innerHTML += `<p><strong>You (voice):</strong> [Voice message]</p>`;
+        chatMessages.innerHTML += `<p><strong>AI:</strong> ${data.response_text}</p>`;
+
+        if (data.audio_url) {
+          // Make sure to use the full URL for audio as well
+          audioPlayer.src = `${BACKEND_URL}${data.audio_url}`;
+          audioPlayer.style.display = 'block';
+          audioPlayer.play();
+        }
+
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      } catch (error) {
+        console.error('Voice Error:', error);
+        chatMessages.innerHTML += `<p><strong>AI:</strong> Voice processing failed.</p>`;
+      }
+
+      recordBtn.textContent = 'Record Voice';
+    };
+  } else {
+    mediaRecorder.stop();
+  }
+});
+
     userInput.addEventListener('keypress', async function (e) {
       if (e.key === 'Enter' && this.value.trim() !== '') {
         const message = this.value.trim();
